@@ -1,0 +1,2188 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Дыхание & Ритм</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* Три темы. По умолчанию — «Глубокий Космос». Переключается через data-theme на <html>. */
+:root, [data-theme="deep"] {
+  --bg: #07090d;
+  --surface: #111720;
+  --surface2: #171f2b;
+  --fg: #eef3f8;
+  --muted: #8b97a8;
+  --line: #1e2735;
+  --accent: #4fd1c5;
+  --accent2: #7c9cff;
+  --accent-fg: #06201e;
+  --glow: rgba(79, 209, 197, 0.35);
+  --tabbar: rgba(12, 16, 22, 0.86);
+  --warn: #e0856b;
+  color-scheme: dark;
+}
+[data-theme="dawn"] {
+  --bg: #f8f3ee;
+  --surface: #ffffff;
+  --surface2: #f3eae3;
+  --fg: #3b3240;
+  --muted: #7e7284;
+  --line: #e9dfe6;
+  --accent: #7cc3ae;
+  --accent2: #f2a488;
+  --accent-fg: #173a33;
+  --glow: rgba(124, 195, 174, 0.35);
+  --tabbar: rgba(255, 255, 255, 0.92);
+  --warn: #c0623f;
+  color-scheme: light;
+}
+[data-theme="oled"] {
+  --bg: #000000;
+  --surface: #060608;
+  --surface2: #0d0d12;
+  --fg: #f2f5ff;
+  --muted: #7d86a0;
+  --line: #1a1d2a;
+  --accent: #29f0ff;
+  --accent2: #8f7dff;
+  --accent-fg: #000000;
+  --glow: rgba(41, 240, 255, 0.55);
+  --tabbar: rgba(0, 0, 0, 0.92);
+  --warn: #ff8a70;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  transition: background 0.5s ease, color 0.5s ease;
+}
+button, input, textarea { font: inherit; color: inherit; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+.app {
+  max-width: 440px;
+  margin: 0 auto;
+  min-height: 100vh;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 112px;
+  overflow-x: clip;
+}
+
+.eyebrow { margin: 0 0 6px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
+.eyebrow.sect { margin-top: 22px; }
+h1 { font-family: "Space Grotesk", "Inter", sans-serif; font-size: 1.75rem; line-height: 1.15; letter-spacing: -0.02em; margin: 0 0 18px; text-wrap: balance; overflow-wrap: anywhere; }
+h2 { font-family: "Space Grotesk", "Inter", sans-serif; font-size: 1.3rem; margin: 0; text-align: center; }
+p { margin: 0; overflow-wrap: anywhere; }
+.muted { color: var(--muted); }
+.small { font-size: 0.82rem; }
+.fine { font-size: 0.78rem; color: var(--muted); line-height: 1.45; margin-top: 18px; text-align: center; }
+
+.screen { animation: fadeUp 0.45s ease both; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.row-between { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; min-width: 0; }
+.row-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* Кнопки */
+.cta {
+  width: 100%; border: 0; border-radius: 16px; padding: 15px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: var(--accent-fg); font-weight: 700; font-size: 1rem; cursor: pointer;
+  min-height: 52px; transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.cta:active { transform: scale(0.99); }
+.cta:disabled { opacity: 0.4; cursor: default; }
+.cta.sm { width: auto; min-width: 150px; padding: 13px 24px; }
+.pill {
+  border-radius: 999px; background: var(--surface); border: 1px solid var(--line);
+  color: var(--fg); padding: 9px 14px; min-height: 40px; font-weight: 600; cursor: pointer;
+  max-width: 100%; overflow-wrap: anywhere; text-align: center;
+}
+.pill:disabled { opacity: 0.4; cursor: default; }
+.chip {
+  font-size: 0.78rem; padding: 6px 12px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--line); color: var(--muted); font-weight: 600;
+}
+
+.seg { display: flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: var(--surface); }
+.seg button {
+  flex: 1; min-width: 0; border: 0; background: transparent; padding: 9px 8px; min-height: 40px;
+  color: var(--muted); font-size: 0.82rem; font-weight: 600; cursor: pointer;
+}
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); }
+.seg.compact { flex: 0 0 auto; }
+.seg.compact button { flex: none; min-height: 32px; padding: 6px 12px; font-size: 0.75rem; }
+.subseg { margin-bottom: 14px; }
+
+/* Настройка */
+.opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.opts.times { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.opt {
+  text-align: left; background: var(--surface); border: 1px solid var(--line);
+  border-radius: 16px; padding: 14px; font-weight: 600; cursor: pointer; min-height: 52px;
+  min-width: 0; overflow-wrap: anywhere;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.opts.times .opt { text-align: center; padding: 12px 6px; font-size: 0.85rem; min-height: 48px; }
+.opt[aria-pressed="true"] { border-color: var(--accent); background: var(--surface2); box-shadow: inset 0 0 0 1px var(--accent); }
+.checkin-cta { margin-top: 24px; }
+
+/* Каталог */
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.mode-card {
+  position: relative; text-align: left; background: var(--surface); border: 1px solid var(--line);
+  border-radius: 20px; padding: 16px 14px; min-height: 138px; display: grid; align-content: start; gap: 6px;
+  min-width: 0; cursor: pointer; animation: rise 0.5s ease both; animation-delay: calc(var(--i) * 60ms);
+}
+.mode-card:hover { border-color: var(--accent); }
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.mode-card .ic { font-size: 1.6rem; line-height: 1; }
+.mode-card strong { font-size: 0.95rem; line-height: 1.25; overflow-wrap: anywhere; }
+.mode-card .pat { font-size: 0.75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.tag {
+  position: absolute; top: 10px; right: 10px; font-size: 0.62rem; padding: 3px 7px;
+  border-radius: 999px; background: var(--accent); color: var(--accent-fg); font-weight: 700;
+}
+
+/* Станция */
+.stage { position: relative; width: min(78vw, 300px); aspect-ratio: 1; margin: 18px auto 8px; }
+.glow {
+  position: absolute; inset: -12%; border-radius: 50%;
+  background: radial-gradient(circle, var(--glow) 0%, transparent 66%);
+  opacity: 0.25; filter: blur(6px);
+}
+.ring2 {
+  position: absolute; inset: 0; border-radius: 50%;
+  border: 1.5px solid var(--accent); opacity: 0.55; transform: scale(0.92);
+}
+.orb {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: radial-gradient(circle at 34% 28%, #c9f7f1, var(--accent) 45%, var(--accent2) 125%);
+  box-shadow: 0 0 60px -6px var(--glow);
+  transform: scale(0.55);
+}
+.stage.hold .glow { animation: glowPulse 2.8s ease-in-out infinite; }
+@keyframes glowPulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.7; } }
+
+.ring-prog {
+  position: absolute; left: -12px; top: -12px; width: calc(100% + 24px); height: calc(100% + 24px);
+  transform: rotate(-90deg); pointer-events: none; overflow: visible; z-index: 3;
+}
+.rp-track { fill: none; stroke: var(--line); stroke-width: 1; }
+.rp-bar { fill: none; stroke: var(--accent); stroke-width: 1.6; stroke-linecap: round; transition: stroke-dashoffset 0.4s linear; }
+
+.phase { font-family: "Space Grotesk", "Inter", sans-serif; font-size: 1.4rem; text-align: center; min-height: 1.6em; }
+.count {
+  font-family: "Space Grotesk", "Inter", sans-serif; font-size: clamp(3.2rem, 16vw, 4.6rem);
+  font-weight: 700; line-height: 1; text-align: center; font-variant-numeric: tabular-nums; margin-top: 6px;
+}
+.sub { text-align: center; font-size: 0.8rem; color: var(--muted); margin-top: 6px; font-variant-numeric: tabular-nums; }
+.controls { display: flex; gap: 10px; justify-content: center; margin: 22px 0 16px; flex-wrap: wrap; }
+
+.summary {
+  margin-top: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 20px;
+  padding: 16px; display: grid; gap: 12px; text-align: center;
+}
+.summary p { color: var(--muted); font-size: 0.92rem; }
+
+/* Тест лёгких */
+.hold-wrap { display: grid; place-items: center; margin: 14px 0 6px; }
+.hold-btn {
+  width: min(70vw, 230px); aspect-ratio: 1; border-radius: 50%; border: 0; cursor: pointer;
+  display: grid; place-content: center; justify-items: center; gap: 6px;
+  background: radial-gradient(circle at 34% 28%, var(--surface2), var(--surface) 70%);
+  box-shadow: 0 0 0 1px var(--line), 0 20px 50px -20px var(--glow), inset 0 2px 1px rgba(255, 255, 255, 0.08);
+  color: var(--fg); touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  transition: transform 0.25s ease, box-shadow 0.4s ease, background 0.4s ease, color 0.4s ease;
+}
+.hold-btn.holding {
+  transform: scale(0.96); color: var(--accent-fg);
+  background: radial-gradient(circle at 34% 28%, #c9f7f1, var(--accent) 55%, var(--accent2));
+  box-shadow: 0 0 0 1px var(--accent), 0 0 80px -10px var(--glow);
+}
+.hold-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; opacity: 0.85; text-align: center; }
+.hold-time {
+  font-family: "Space Grotesk", "Inter", sans-serif; font-size: clamp(2rem, 9vw, 2.8rem);
+  font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; text-align: center;
+}
+.lung-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+.stat {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 14px; min-width: 0;
+}
+.stat strong { display: block; font-family: "Space Grotesk", "Inter", sans-serif; font-size: 1.35rem; font-variant-numeric: tabular-nums; line-height: 1.25; overflow-wrap: anywhere; }
+.rank-list { display: grid; gap: 6px; margin-top: 12px; }
+.rank-row {
+  display: flex; justify-content: space-between; gap: 10px; font-size: 0.86rem;
+  padding: 10px 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line);
+}
+.rank-row.current { border-color: var(--accent); background: var(--surface2); }
+.rank-row span { min-width: 0; overflow-wrap: anywhere; }
+.rank-row span:last-child { color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; }
+.warn-box {
+  margin-top: 16px; font-size: 0.8rem; line-height: 1.45; color: var(--muted);
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px;
+}
+
+/* Статистика */
+.stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.hero {
+  background: linear-gradient(140deg, var(--surface2), var(--surface)); border: 1px solid var(--line);
+  border-radius: 24px; padding: 20px; display: grid; gap: 8px; min-width: 0;
+}
+.hero-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.lvl-name { font-family: "Space Grotesk", "Inter", sans-serif; font-size: 1.7rem; font-weight: 700; line-height: 1.1; overflow-wrap: anywhere; }
+.xp-num { font-family: "Space Grotesk", "Inter", sans-serif; font-size: 1.1rem; font-variant-numeric: tabular-nums; color: var(--muted); }
+.bar { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.bar > i { display: block; height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.6s ease; }
+.streak-line { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--muted); flex-wrap: wrap; }
+.streak-line strong { font-family: "Space Grotesk", "Inter", sans-serif; font-size: 1.4rem; color: var(--fg); font-variant-numeric: tabular-nums; }
+
+.section-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 24px 0 12px; flex-wrap: wrap; }
+.section-head h2 { text-align: left; font-size: 1.1rem; }
+
+.chart-card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 16px 12px 12px;
+  display: grid; gap: 10px; min-width: 0;
+}
+.chart { display: flex; align-items: stretch; gap: 6px; height: 160px; min-width: 0; }
+.col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.col .val {
+  font-size: 0.62rem; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums;
+  min-height: 1em; max-width: 100%; overflow: hidden; text-overflow: clip;
+}
+.col .bar-wrap { flex: 1; width: 100%; display: flex; align-items: flex-end; }
+.col .bar-col {
+  width: 100%; border-radius: 10px 10px 6px 6px; min-height: 3px;
+  background: linear-gradient(180deg, var(--accent), var(--accent2)); opacity: 0.55;
+  transition: height 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.col.today .bar-col { opacity: 1; box-shadow: 0 0 18px -4px var(--glow); }
+.col .day { font-size: 0.7rem; color: var(--muted); text-transform: lowercase; white-space: nowrap; }
+.col.today .day { color: var(--fg); font-weight: 700; }
+
+.medals { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+/* Базовая палитра = матовый графит (заблокировано). Тиры переопределяют ниже. */
+.medal-card, .rung, .preview {
+  --hi: #424a55; --mid: #2a3039; --lo: #161a20; --dark: #07090c;
+  --icon: #444c57; --chip: #6b7480; --gloss: 0.08;
+}
+.medal-card {
+  width: 100%; min-width: 0; color: var(--fg); cursor: pointer;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 22px;
+  padding: 18px 12px 16px; display: grid; justify-items: center; gap: 6px; text-align: center;
+}
+.medal-card:hover { border-color: var(--accent); }
+.locked strong { color: var(--muted); }
+
+[data-tier="bronze"] {
+  --hi: #fbd7b0; --mid: #c98550; --lo: #6e3d1c; --dark: #3a1e0d;
+  --icon: #5a2f12; --chip: #b86a2c; --gloss: 0.9;
+}
+[data-tier="silver"] {
+  --hi: #ffffff; --mid: #d3dae4; --lo: #6b7889; --dark: #262e39;
+  --icon: #3a4452; --chip: #5f6b7b; --gloss: 0.9;
+}
+[data-tier="gold"] {
+  --hi: #fff6c4; --mid: #e6b64c; --lo: #8a5a0c; --dark: #482d05;
+  --icon: #6a4306; --chip: #a8720c; --gloss: 0.9;
+}
+[data-tier="diamond"] {
+  --hi: #ffffff; --mid: #9ef3fc; --lo: #1f9bbd; --dark: #0b4458;
+  --icon: #0c5a70; --chip: #0f8aa3; --gloss: 0.95;
+}
+
+.medal-unit { position: relative; display: grid; justify-items: center; margin-bottom: 6px; }
+
+.bail {
+  position: absolute; top: 0; left: 50%; z-index: 2; width: 22px; height: 22px;
+  transform: translateX(-50%); border-radius: 50%;
+  border: 4px solid var(--mid);
+  border-color: var(--hi) var(--lo) var(--lo) var(--hi);
+  box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.45);
+}
+
+.ribbon {
+  position: relative; z-index: 0; width: 46px; height: 66px; margin: 10px auto -22px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 86%, 0 100%);
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.14) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.14) 0 1px, transparent 1px 3px),
+    linear-gradient(90deg, var(--rib2), var(--rib1) 45%, var(--rib2));
+}
+
+.disc {
+  position: relative; z-index: 1; width: 108px; height: 108px; border-radius: 50%;
+  background: conic-gradient(from 200deg,
+    var(--lo) 0deg, var(--hi) 40deg, var(--mid) 95deg, var(--lo) 150deg,
+    var(--mid) 215deg, var(--hi) 270deg, var(--mid) 320deg, var(--lo) 360deg);
+  box-shadow:
+    0 18px 26px -12px rgba(0, 0, 0, 0.75),
+    inset 0 2px 1px rgba(255, 255, 255, 0.55),
+    inset 0 -3px 3px rgba(0, 0, 0, 0.45);
+}
+.disc::after {
+  content: ""; position: absolute; inset: 0; border-radius: 50%; z-index: 3; pointer-events: none;
+  background: linear-gradient(115deg, transparent 38%, rgba(255, 255, 255, 0.75) 50%, transparent 62%);
+  background-size: 260% 100%; mix-blend-mode: overlay; opacity: var(--gloss);
+  animation: shine 4.6s ease-in-out infinite;
+}
+@keyframes shine { 0% { background-position: 140% 0; } 55%, 100% { background-position: -60% 0; } }
+
+.face {
+  position: absolute; inset: 10px; z-index: 1; border-radius: 50%;
+  display: grid; place-items: center;
+  background:
+    radial-gradient(circle at 30% 22%, rgba(255, 255, 255, var(--gloss)) 0%, rgba(255, 255, 255, 0) 36%),
+    radial-gradient(circle at 50% 58%, var(--mid) 0%, var(--lo) 74%, var(--dark) 100%);
+  box-shadow:
+    inset 0 3px 5px rgba(255, 255, 255, 0.5),
+    inset 0 -5px 9px rgba(0, 0, 0, 0.5),
+    0 0 0 1px var(--dark);
+}
+.face::before {
+  content: ""; position: absolute; inset: 9px; border-radius: 50%;
+  border: 1.5px solid rgba(0, 0, 0, 0.28); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.emb { width: 46%; height: auto; aspect-ratio: 1; overflow: visible; position: relative; }
+.ic-sh { fill: rgba(0, 0, 0, 0.5); }
+.ic-hi { fill: rgba(255, 255, 255, 0.6); }
+.ic-main { fill: var(--icon); }
+.locked .ic-hi { fill: rgba(255, 255, 255, 0.06); }
+.locked .ic-sh { fill: rgba(0, 0, 0, 0.8); }
+
+[data-tier="diamond"] .disc {
+  box-shadow:
+    0 18px 28px -12px rgba(31, 155, 189, 0.7),
+    0 0 28px rgba(126, 236, 255, 0.45),
+    inset 0 2px 1px rgba(255, 255, 255, 0.7),
+    inset 0 -3px 3px rgba(0, 60, 80, 0.5);
+}
+[data-tier="diamond"] .disc::before {
+  content: ""; position: absolute; inset: -1px; border-radius: 50%; z-index: 4; pointer-events: none;
+  background: conic-gradient(from 0deg,
+    rgba(190, 250, 255, 0), #c9fbff, rgba(255, 255, 255, 0) 22%,
+    #7fe9ff 40%, rgba(255, 255, 255, 0) 58%, #e6fdff 76%, rgba(255, 255, 255, 0));
+  mix-blend-mode: screen; opacity: 0.8; animation: spin 6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.locked .disc {
+  box-shadow:
+    0 14px 22px -10px rgba(0, 0, 0, 0.9),
+    inset 0 2px 2px rgba(255, 255, 255, 0.05),
+    inset 0 -4px 6px rgba(0, 0, 0, 0.8);
+}
+.locked .disc::after { display: none; }
+
+.rank-chip {
+  font-size: 0.72rem; font-weight: 700; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--chip); color: var(--chip); margin-top: 4px; max-width: 100%;
+}
+.dots { display: flex; gap: 5px; }
+.dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--line); }
+.dots i.on { background: var(--chip); }
+.mprog { width: 84%; height: 5px; border-radius: 3px; background: var(--line); overflow: hidden; margin-top: 2px; }
+.mprog > i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+
+.modal { position: fixed; inset: 0; z-index: 60; display: grid; place-items: end center; padding: 16px; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: fadeIn 0.25s ease both; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal-sheet {
+  position: relative; width: min(100%, 400px); max-height: 88vh; overflow-y: auto;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 28px;
+  padding: 26px 18px 22px; display: grid; justify-items: center; gap: 10px; text-align: center;
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.6);
+  animation: sheetUp 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes sheetUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: none; } }
+.modal-x {
+  position: absolute; top: 12px; right: 12px; width: 40px; height: 40px; padding: 0;
+  border-radius: 50%; background: var(--surface2); border: 0; cursor: pointer; font-size: 1rem;
+}
+.modal-title { font-family: "Space Grotesk", "Inter", sans-serif; font-size: 1.4rem; margin-top: 4px; }
+.preview { display: grid; justify-items: center; padding: 4px 0 2px; }
+.preview .medal-unit { margin-bottom: 0; }
+.modal-meta { display: grid; gap: 4px; justify-items: center; }
+.ladder { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; width: 100%; margin-top: 6px; }
+.rung {
+  display: grid; justify-items: center; gap: 2px; padding: 8px 4px 10px; min-width: 0;
+  border-radius: 16px; background: var(--surface2); border: 1px solid var(--line);
+}
+.rung.reached { border-color: var(--chip); }
+.rung .mini { height: 60px; width: 100%; overflow: hidden; }
+.rung .mini .medal-unit { transform: scale(0.37); transform-origin: 50% 0; width: max-content; margin: 0 auto; }
+.rung strong { font-size: 0.72rem; overflow-wrap: anywhere; }
+.rung span { font-size: 0.68rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* Настройки и сохранение */
+.sync { font-size: 0.82rem; color: var(--muted); line-height: 1.5; margin-bottom: 10px; }
+.sync.ok { color: var(--accent); }
+.sync.err { color: var(--warn); }
+.backup {
+  margin-top: 12px; display: grid; gap: 10px; min-width: 0;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 14px;
+}
+.backup textarea {
+  width: 100%; min-width: 0; min-height: 84px; resize: vertical; padding: 10px; border-radius: 12px;
+  background: var(--bg); border: 1px solid var(--line); color: var(--fg);
+  font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.75rem; overflow-wrap: anywhere;
+}
+.file-pick { position: relative; display: inline-flex; align-items: center; cursor: pointer; overflow: hidden; }
+.file-pick input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+.setting-block { display: grid; gap: 10px; margin-bottom: 4px; }
+.profile-actions { display: grid; gap: 10px; margin-top: 16px; }
+
+/* OLED: неоновое свечение вместо теней */
+[data-theme="oled"] .stat,
+[data-theme="oled"] .hero,
+[data-theme="oled"] .chart-card,
+[data-theme="oled"] .mode-card,
+[data-theme="oled"] .medal-card,
+[data-theme="oled"] .opt,
+[data-theme="oled"] .rank-row,
+[data-theme="oled"] .warn-box,
+[data-theme="oled"] .summary,
+[data-theme="oled"] .backup,
+[data-theme="oled"] .modal-sheet {
+  box-shadow: 0 0 0 1px var(--line), 0 0 22px -10px var(--glow);
+}
+[data-theme="oled"] .cta { box-shadow: 0 0 26px -4px var(--glow); }
+[data-theme="oled"] .orb { box-shadow: 0 0 90px -2px var(--glow); }
+[data-theme="oled"] .hold-btn { box-shadow: 0 0 0 1px var(--accent), 0 0 60px -10px var(--glow); }
+[data-theme="oled"] .tabbar { box-shadow: 0 -1px 0 var(--line), 0 -10px 30px -12px var(--glow); }
+[data-theme="oled"] .tab-btn[aria-current="page"] { text-shadow: 0 0 10px var(--glow); }
+
+/* Dawn: мягкие тени вместо контуров */
+[data-theme="dawn"] .stat,
+[data-theme="dawn"] .hero,
+[data-theme="dawn"] .chart-card,
+[data-theme="dawn"] .mode-card,
+[data-theme="dawn"] .medal-card {
+  box-shadow: 0 10px 30px -18px rgba(90, 60, 80, 0.35);
+}
+
+.tabbar {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: env(safe-area-inset-bottom, 0px);
+  width: min(100%, 440px); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px;
+  padding: 8px 16px 10px; background: var(--tabbar); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--line); z-index: 40;
+}
+.tab-btn {
+  background: none; border: 0; color: var(--muted); display: grid; justify-items: center; gap: 2px;
+  font-size: 0.74rem; font-weight: 600; min-height: 52px; min-width: 0; cursor: pointer;
+}
+.tab-btn .ti { font-size: 1.35rem; line-height: 1; }
+.tab-btn[aria-current="page"] { color: var(--accent); }
+
+/* Узкие телефоны (около 320 px): сетки становятся плотнее, ничего не выходит за экран */
+@media (max-width: 360px) {
+  .opts.times { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .chart { gap: 3px; }
+  .col .val { font-size: 0.56rem; }
+  .medals { gap: 10px; }
+  .lung-stats, .stat-row { gap: 8px; }
+  .stat strong { font-size: 1.15rem; }
+  .ladder { gap: 6px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+<div class="app">
+  <!-- Вкладка «Дыхание» -->
+  <div id="viewBreath">
+    <div class="seg subseg" id="subSeg" role="group" aria-label="Раздел дыхания">
+      <button type="button" data-sub="session" aria-pressed="true">Сессия</button>
+      <button type="button" data-sub="lungs" aria-pressed="false">Тест лёгких</button>
+    </div>
+
+    <div id="subSession">
+      <section class="screen" id="scrCheck" hidden>
+        <p class="eyebrow">Настройка</p>
+        <h1>Как ты себя чувствуешь?</h1>
+        <div class="opts" id="feelings"></div>
+        <p class="eyebrow sect">Сколько времени</p>
+        <div class="opts times" id="times"></div>
+        <button type="button" class="cta checkin-cta" id="btnToCatalog">Продолжить</button>
+      </section>
+
+      <section class="screen" id="scrCatalog" hidden>
+        <div class="row-between">
+          <div style="min-width:0">
+            <p class="eyebrow" id="catSub"></p>
+            <h1 style="margin:0">Режимы</h1>
+          </div>
+          <button type="button" class="pill" id="btnEditCheck">Изменить</button>
+        </div>
+        <div class="grid" id="modeGrid" style="margin-top:14px"></div>
+        <p class="fine">Если от дыхания кружится голова, немеют пальцы или трудно дышать, останови упражнение и дыши обычно. При проблемах с сердцем или лёгкими сначала спроси врача.</p>
+      </section>
+
+      <section class="screen" id="scrSession" hidden>
+        <div class="row-between">
+          <button type="button" class="pill" id="btnBack">‹ Режимы</button>
+          <span class="chip" id="limitChip">Без лимита</span>
+        </div>
+        <h2 id="modeTitle"></h2>
+        <div class="stage" id="stage" aria-hidden="true">
+          <div class="glow" id="glow"></div>
+          <div class="ring2" id="ring2"></div>
+          <div class="orb" id="orb"></div>
+          <svg class="ring-prog" viewBox="0 0 100 100">
+            <circle class="rp-track" cx="50" cy="50" r="48" pathLength="100"/>
+            <circle class="rp-bar" id="rpBar" cx="50" cy="50" r="48" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"/>
+          </svg>
+        </div>
+        <div class="phase" id="phaseLabel" aria-live="polite"></div>
+        <div class="count" id="count">4</div>
+        <div class="sub" id="subLine"></div>
+        <div class="controls">
+          <button type="button" class="cta sm" id="btnPlay">Старт</button>
+          <button type="button" class="pill" id="btnFinish">Завершить</button>
+          <button type="button" class="pill" id="btnReset">Сброс</button>
+        </div>
+        <div class="summary" id="summary" hidden>
+          <p id="sumText"></p>
+        </div>
+        <p class="fine">Если от дыхания кружится голова, немеют пальцы или трудно дышать, останови упражнение и дыши обычно. При проблемах с сердцем или лёгкими сначала спроси врача.</p>
+      </section>
+    </div>
+
+    <div id="subLungs" hidden>
+      <section class="screen">
+        <p class="eyebrow">Тест</p>
+        <h1>Тест лёгких</h1>
+        <p class="small muted">Сделай спокойный глубокий вдох, зажми кнопку и держи, пока воздух не закончится. Отпусти, и приложение запишет время и начислит XP.</p>
+
+        <div class="hold-wrap">
+          <button type="button" class="hold-btn" id="holdBtn" aria-label="Зажми и держи, пока хватает воздуха">
+            <span class="hold-label" id="holdLabel">Зажми</span>
+            <span class="hold-time" id="holdTime">0 сек</span>
+          </button>
+        </div>
+
+        <div class="lung-stats">
+          <div class="stat"><span class="eyebrow">Личный рекорд</span><strong id="bestHold">—</strong></div>
+          <div class="stat"><span class="eyebrow">Последний раз</span><strong id="lastHold">—</strong></div>
+        </div>
+
+        <div class="section-head">
+          <h2>Уровни</h2>
+          <span class="small muted" id="lungRankNow"></span>
+        </div>
+        <div class="rank-list" id="rankList"></div>
+
+        <div class="warn-box">Не задерживай дыхание в воде, за рулём и на высоте, а также если есть проблемы с сердцем или лёгкими. Если кружится голова или немеет тело, сразу отпусти кнопку и дыши обычно.</div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Вкладка «Статистика» -->
+  <div id="viewStats" hidden>
+    <section class="screen">
+      <p class="eyebrow">Статистика</p>
+      <h1>Твой прогресс</h1>
+
+      <div class="hero">
+        <div class="hero-top">
+          <span class="eyebrow" id="lvlNum">Уровень 1</span>
+          <span class="xp-num" id="xpTotal">0 XP</span>
+        </div>
+        <div class="lvl-name" id="lvlName">Новичок</div>
+        <div class="bar"><i id="xpBar" style="width:0%"></i></div>
+        <p class="small muted" id="xpNext"></p>
+        <div class="streak-line">🔥 <strong id="streakNum">0</strong> дней подряд</div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat"><span class="eyebrow">Всего дыхания</span><strong id="totalMin">0 сек</strong></div>
+        <div class="stat"><span class="eyebrow">Циклов всего</span><strong id="totalCycles">0</strong></div>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><span class="eyebrow">Рекорд задержки</span><strong id="bestHold2">—</strong></div>
+        <div class="stat"><span class="eyebrow">Медалей</span><strong id="medalCount">0 / 5</strong></div>
+      </div>
+
+      <div class="section-head">
+        <h2>Активность за 7 дней</h2>
+        <div class="seg compact" id="chartSeg">
+          <button type="button" data-metric="ms" aria-pressed="true">Минуты</button>
+          <button type="button" data-metric="cycles" aria-pressed="false">Циклы</button>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart" id="chart"></div>
+        <p class="small muted" id="weekTotal"></p>
+      </div>
+
+      <div class="section-head"><h2>Медали</h2></div>
+      <div class="medals" id="medalGrid"></div>
+      <p class="fine">Нажми на медаль, чтобы увидеть условия и ранги.</p>
+    </section>
+  </div>
+
+  <!-- Вкладка «Настройки» -->
+  <div id="viewSettings" hidden>
+    <section class="screen">
+      <p class="eyebrow">Настройки</p>
+      <h1>Оформление и данные</h1>
+
+      <div class="section-head"><h2>Тема</h2></div>
+      <div class="setting-block">
+        <div class="seg" id="themeSeg">
+          <button type="button" data-theme-pick="deep">Космос</button>
+          <button type="button" data-theme-pick="dawn">Рассвет</button>
+          <button type="button" data-theme-pick="oled">OLED</button>
+        </div>
+        <p class="small muted" id="themeHint" style="text-align:center"></p>
+      </div>
+
+      <div class="section-head"><h2>Звук</h2></div>
+      <div class="setting-block">
+        <div class="seg" id="soundSeg">
+          <button type="button" data-sound="off">Выкл</button>
+          <button type="button" data-sound="noise">Шум</button>
+          <button type="button" data-sound="drone">Эмбиент</button>
+        </div>
+        <p class="small muted" style="text-align:center">Звук создаётся в браузере, файлы не нужны. Играет только во время сессии.</p>
+      </div>
+
+      <div class="section-head"><h2>Вибрация</h2></div>
+      <button type="button" class="pill" id="btnHaptics" style="width:100%">Вибрация: вкл</button>
+
+      <div class="section-head"><h2>Сохранение</h2></div>
+      <p class="sync" id="syncStatus"></p>
+      <div class="row-btns">
+        <button type="button" class="pill" id="btnExport">Экспорт прогресса</button>
+        <button type="button" class="pill" id="btnImport">Импорт прогресса</button>
+      </div>
+      <div class="backup" id="backupBox" hidden>
+        <textarea id="backupText" rows="3" spellcheck="false" aria-label="Строка резервной копии"></textarea>
+        <div class="row-btns">
+          <button type="button" class="pill" id="btnCopy" hidden>Скопировать</button>
+          <button type="button" class="pill" id="btnSaveFile" hidden>Сохранить файл</button>
+          <label class="pill file-pick" id="fileLabel" hidden>Выбрать файл<input type="file" id="fileIn" accept=".json,.txt,application/json,text/plain"></label>
+          <button type="button" class="pill" id="btnApply" hidden>Загрузить</button>
+        </div>
+        <p class="small muted" id="backupMsg"></p>
+      </div>
+
+      <div class="section-head"><h2>Сброс</h2></div>
+      <div class="profile-actions">
+        <button type="button" class="pill" id="btnResetSettings" style="width:100%">Сбросить настройки</button>
+        <button type="button" class="pill" id="btnResetAll" style="width:100%">Сбросить прогресс</button>
+      </div>
+      <p class="fine">Дыхание &amp; Ритм v0.19.2</p>
+    </section>
+  </div>
+</div>
+
+<div class="modal" id="medalModal" hidden role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-sheet" id="mSheet">
+    <button type="button" class="modal-x" data-close aria-label="Закрыть">✕</button>
+    <div id="mBody"></div>
+  </div>
+</div>
+
+<nav class="tabbar">
+  <button type="button" class="tab-btn" data-tab="breath"><span class="ti">🧘</span><span>Дыхание</span></button>
+  <button type="button" class="tab-btn" data-tab="stats"><span class="ti">📊</span><span>Статистика</span></button>
+  <button type="button" class="tab-btn" data-tab="settings"><span class="ti">⚙️</span><span>Настройки</span></button>
+</nav>
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const clamp01 = (x) => Math.max(0, Math.min(1, x));
+  const APP = 'dyhanie-ritm';
+  const SCHEMA = 3;
+  // Ключи прежних версий: их читаем, чтобы сохранённая память не потерялась
+  const KEY_V3 = 'dyhanie-ritm-v3';
+  const KEY_V3_BAK = 'dyhanie-ritm-v3-bak';
+  const KEY_V2 = 'dyhanie-ritm-v2';
+  const KEY_V1 = 'dyhanie-ritm-v1';
+  const THEMES = ['deep', 'dawn', 'oled'];
+  const THEME_HINTS = {
+    deep: 'Глубокий Космос: тёмный фон и бирюзовое кольцо.',
+    dawn: 'Мягкий Рассвет: пастельные тона для дневного света.',
+    oled: 'True OLED: чёрный фон и неоновое свечение для ночи.'
+  };
+  const SOUNDS = ['off', 'noise', 'drone'];
+  const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+  const DAYS_KEPT = 90;
+  const MAX_IMPORT_CHARS = 2000000;
+  const HOLD_GAP_MS = 1000; // пауза между кадрами дольше этого = приложение уходило в фон
+
+  const FEELINGS = [
+    { id: 'brain', label: 'Мозг кипит', mode: 'box' },
+    { id: 'sleep', label: 'Не могу уснуть', mode: 'relax' },
+    { id: 'study', label: 'Рубит на учёбе', mode: 'wake' },
+    { id: 'pause', label: 'Просто пауза', mode: 'chill' }
+  ];
+
+  const TIMES = [
+    { ms: 60000, label: '1 мин' },
+    { ms: 180000, label: '3 мин' },
+    { ms: 300000, label: '5 мин' },
+    { ms: 0, label: 'Без лимита' }
+  ];
+
+  const MODES = {
+    relax: {
+      icon: '🌙', name: 'Сон 4-7-8',
+      phases: [
+        { label: 'Вдох носом', dur: 4000, target: 1 },
+        { label: 'Задержка', dur: 7000, target: null },
+        { label: 'Медленный выдох', dur: 8000, target: 0.55 }
+      ]
+    },
+    box: {
+      icon: '🛡️', name: 'Анти-паника / Квадрат',
+      phases: [
+        { label: 'Вдох', dur: 4000, target: 1 },
+        { label: 'Задержка', dur: 4000, target: null },
+        { label: 'Выдох', dur: 4000, target: 0.55 },
+        { label: 'Задержка', dur: 4000, target: null }
+      ]
+    },
+    wake: {
+      icon: '⚡', name: 'Не уснуть на паре',
+      phases: [
+        { label: 'Резкий вдох', dur: 2000, target: 1 },
+        { label: 'Пауза', dur: 1000, target: null },
+        { label: 'Активный выдох', dur: 2000, target: 0.55 }
+      ]
+    },
+    focus: {
+      icon: '🎯', name: 'Поток и учёба',
+      phases: [
+        { label: 'Ровный вдох', dur: 5000, target: 1 },
+        { label: 'Ровный выдох', dur: 5000, target: 0.55 }
+      ]
+    },
+    sigh: {
+      icon: '😮‍💨', name: 'Сброс зажима',
+      phases: [
+        { label: 'Глубокий вдох', dur: 3000, target: 0.85 },
+        { label: 'Добавочный вдох', dur: 1500, target: 1 },
+        { label: 'Долгий выдох', dur: 6000, target: 0.55 }
+      ]
+    },
+    chill: {
+      icon: '☕', name: 'Просто посидеть',
+      phases: [
+        { label: 'Вдох', dur: 4000, target: 1 },
+        { label: 'Выдох', dur: 6000, target: 0.55 }
+      ]
+    }
+  };
+
+  const RANKS = ['Бронза', 'Серебро', 'Золото', 'Алмаз'];
+  const RIBBON_TIERS = ['bronze', 'silver', 'gold', 'diamond'];
+  const MEDALS = [
+    { id: 'first', name: 'Первый вдох', cond: 'Циклы дыхания всего', icon: 'cloud',
+      ribbon: ['#b3263a', '#5e1220'], tiers: [1, 5, 20, 50], metric: (s) => s.cycles },
+    { id: 'iron', name: 'Железные лёгкие', cond: 'Циклы дыхания всего', icon: 'lungs',
+      ribbon: ['#1f4f86', '#0f2a4a'], tiers: [10, 30, 80, 200], metric: (s) => s.cycles },
+    { id: 'owl', name: 'Ночной совёнок', cond: 'Циклы в режиме «Сон 4-7-8»', icon: 'owl',
+      ribbon: ['#2f7a5b', '#183f2f'], tiers: [3, 10, 25, 60], metric: (s) => s.modeCycles.relax || 0 },
+    { id: 'survivor', name: 'Выжил на паре', cond: 'Циклы в режиме «Не уснуть на паре»', icon: 'cap',
+      ribbon: ['#6b3fa0', '#35205a'], tiers: [3, 10, 25, 60], metric: (s) => s.modeCycles.wake || 0 },
+    { id: 'zen', name: 'Дзен-мастер', cond: 'Завершённые циклы дыхания', icon: 'lotus',
+      ribbon: ['#1d8a86', '#0c4441'], tiers: [3, 5, 15, 30],
+      metric: (s) => s.cycles }
+  ];
+
+  const LUNG_RANKS = [
+    { min: 0, name: 'Лёгкие новичка', label: 'до 15 сек' },
+    { min: 15, name: 'Ученик глубины', label: '15–29 сек' },
+    { min: 30, name: 'Дайвер', label: '30–44 сек' },
+    { min: 45, name: 'Фридайвер', label: '45–59 сек' },
+    { min: 60, name: 'Морской котик', label: '1 мин и больше' }
+  ];
+
+  const LEVELS = [
+    { min: 0, name: 'Новичок' },
+    { min: 300, name: 'Практик' },
+    { min: 1000, name: 'Мастер Дзена' },
+    { min: 2500, name: 'Наставник дыхания' }
+  ];
+
+  const ICONS = {
+    cloud: 'M7 18h10.5a4 4 0 0 0 .3-8 5.5 5.5 0 0 0-10.4-1.2A4.5 4.5 0 0 0 7 18z',
+    lungs: 'M9.5 6.2c-2.9.6-5.2 3.4-5.2 8.1 0 2.8 1.6 4.6 3.6 4.6 1.6 0 2.4-1.2 2.4-2.8V8.6c0-1.1-.4-2.1-.8-2.4zM14.5 6.2c2.9.6 5.2 3.4 5.2 8.1 0 2.8-1.6 4.6-3.6 4.6-1.6 0-2.4-1.2-2.4-2.8V8.6c0-1.1.4-2.1.8-2.4zM11 2.5h2v8h-2z',
+    owl: 'M6 4.5l3 3.2c.9-.3 1.9-.4 3-.4s2.1.1 3 .4l3-3.2c1.2 1.4 1.9 3.2 1.9 5.4 0 .9-.1 1.8-.3 2.6.7 1 1.1 2.3 1.1 3.6 0 3.6-2.6 6.1-6.7 6.1S5.5 19.7 5.5 16.1c0-1.3.4-2.6 1.1-3.6-.2-.8-.3-1.7-.3-2.6 0-2.2.7-4 1.7-5.4zM9 12.2a1.6 1.6 0 1 0 0 3.2 1.6 1.6 0 0 0 0-3.2zM15 12.2a1.6 1.6 0 1 0 0 3.2 1.6 1.6 0 0 0 0-3.2z',
+    cap: 'M12 4.5l10 4.7-10 4.7L2 9.2zM6.2 12.2L12 14.9l5.8-2.7v4.3c0 1.6-2.6 2.9-5.8 2.9s-5.8-1.3-5.8-2.9zM19.8 10.2h.9v5.4h-.9z',
+    lotus: 'M12 2.5c2.3 2.7 3 5.9 0 10.9-3-5-2.3-8.2 0-10.9zM10.6 9.8C7.2 10.9 5.4 13.9 6.2 17.6c3.7-.4 5.3-3.1 4.4-7.8zM13.4 9.8c3.4 1.1 5.2 4.1 4.4 7.8-3.7-.4-5.3-3.1-4.4-7.8zM3 18.4h18v2H3z',
+    lock: 'M8 10.4V8a4 4 0 0 1 8 0v2.4h-2V8a2 2 0 0 0-4 0v2.4zM5.5 11h13v10.5h-13z'
+  };
+
+  function iconSvg(name) {
+    const d = ICONS[name];
+    return `<svg class="emb" viewBox="0 0 24 24" aria-hidden="true" focusable="false">` +
+      `<path class="ic-sh" transform="translate(0.7 0.9)" fill-rule="evenodd" d="${d}"/>` +
+      `<path class="ic-hi" transform="translate(-0.5 -0.6)" fill-rule="evenodd" d="${d}"/>` +
+      `<path class="ic-main" fill-rule="evenodd" d="${d}"/>` +
+      `</svg>`;
+  }
+
+  function medalUnit(m, locked) {
+    const ribbonStyle = locked
+      ? '--rib1:#2b3038;--rib2:#14171c'
+      : `--rib1:${m.ribbon[0]};--rib2:${m.ribbon[1]}`;
+    return `<div class="medal-unit">
+        <span class="bail"></span>
+        <div class="ribbon" style="${ribbonStyle}"></div>
+        <div class="disc"><div class="face">${iconSvg(locked ? 'lock' : m.icon)}</div></div>
+      </div>`;
+  }
+
+  // ===== Даты: календарная арифметика (без вычитания 86400000 мс) =====
+  function addDays(n) {
+    const d = new Date();
+    d.setDate(d.getDate() + n);
+    return d;
+  }
+
+  function dayKey(d = new Date()) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+
+  // ===== Модель данных =====
+  // epoch растёт при полном сбросе; savedAt — время последней записи.
+  const defaults = () => ({
+    schema: SCHEMA, epoch: 0, savedAt: 0,
+    ms: 0, cycles: 0, modeCycles: {}, streak: 0, lastDay: null, medals: {}, daily: {}, xp: 0,
+    bestHoldMs: 0, lastHoldMs: 0,
+    theme: 'deep', haptics: true, sound: 'off',
+    onboarded: false, feeling: null, limitMs: null, lastMode: null
+  });
+
+  const has = (obj, key) => Object.prototype.hasOwnProperty.call(obj, key);
+
+  // Защита структуры: старые или испорченные данные приводятся к безопасному виду
+  function sanitize(d) {
+    const out = defaults();
+    if (!d || typeof d !== 'object' || Array.isArray(d)) return out;
+    const num = (x) => (typeof x === 'number' && Number.isFinite(x) && x >= 0 ? x : 0);
+
+    out.epoch = Math.floor(num(d.epoch));
+    out.savedAt = num(d.savedAt);
+    out.ms = num(d.ms);
+    out.cycles = num(d.cycles);
+    out.streak = Math.floor(num(d.streak));
+    out.xp = num(d.xp);
+    out.bestHoldMs = num(d.bestHoldMs);
+    out.lastHoldMs = num(d.lastHoldMs);
+    out.lastDay = typeof d.lastDay === 'string' && DATE_RE.test(d.lastDay) ? d.lastDay : null;
+
+    if (d.modeCycles && typeof d.modeCycles === 'object') {
+      Object.keys(MODES).forEach((k) => { out.modeCycles[k] = num(d.modeCycles[k]); });
+    }
+    if (d.medals && typeof d.medals === 'object') {
+      MEDALS.forEach((m) => {
+        const v = d.medals[m.id];
+        if (typeof v === 'number') out.medals[m.id] = Math.min(4, Math.floor(num(v)));
+        else if (typeof v === 'string' && v) out.medals[m.id] = 1; // старый формат: дата получения
+      });
+    }
+    if (d.daily && typeof d.daily === 'object') {
+      Object.keys(d.daily).forEach((k) => {
+        const r = d.daily[k];
+        if (DATE_RE.test(k) && r && typeof r === 'object') {
+          out.daily[k] = { ms: num(r.ms), cycles: num(r.cycles) };
+        }
+      });
+    }
+
+    out.theme = THEMES.includes(d.theme) ? d.theme : (d.theme === 'light' ? 'dawn' : 'deep');
+    out.haptics = typeof d.haptics === 'boolean' ? d.haptics : true;
+    out.sound = SOUNDS.includes(d.sound) ? d.sound : 'off';
+    out.onboarded = d.onboarded === true;
+    out.feeling = FEELINGS.some((f) => f.id === d.feeling) ? d.feeling : null;
+    out.limitMs = typeof d.limitMs === 'number' && Number.isFinite(d.limitMs) && d.limitMs >= 0 ? d.limitMs : null;
+    out.lastMode = typeof d.lastMode === 'string' && has(MODES, d.lastMode) ? d.lastMode : null;
+    return out;
+  }
+
+  // Объединение без потерь: заработанное берётся максимумом.
+  // Разный epoch означает полный сброс: побеждает запись с большим epoch целиком.
+  function mergeStores(a, b) {
+    if (a.epoch !== b.epoch) return sanitize(a.epoch > b.epoch ? a : b);
+    const newer = a.savedAt >= b.savedAt ? a : b;
+    const out = sanitize(newer);
+    // Серия: берём более поздний день; если день одинаковый — больший счётчик
+    const later = (a.lastDay || '') >= (b.lastDay || '') ? a : b;
+    out.lastDay = later.lastDay;
+    out.streak = a.lastDay === b.lastDay ? Math.max(a.streak, b.streak) : later.streak;
+    out.epoch = a.epoch;
+    out.savedAt = Math.max(a.savedAt, b.savedAt);
+    out.ms = Math.max(a.ms, b.ms);
+    out.cycles = Math.max(a.cycles, b.cycles);
+    out.xp = Math.max(a.xp, b.xp);
+    out.bestHoldMs = Math.max(a.bestHoldMs, b.bestHoldMs);
+    Object.keys(MODES).forEach((k) => {
+      out.modeCycles[k] = Math.max(a.modeCycles[k] || 0, b.modeCycles[k] || 0);
+    });
+    MEDALS.forEach((m) => {
+      out.medals[m.id] = Math.max(a.medals[m.id] || 0, b.medals[m.id] || 0);
+    });
+    out.daily = {};
+    new Set([...Object.keys(a.daily), ...Object.keys(b.daily)]).forEach((k) => {
+      const x = a.daily[k] || { ms: 0, cycles: 0 };
+      const y = b.daily[k] || { ms: 0, cycles: 0 };
+      out.daily[k] = { ms: Math.max(x.ms, y.ms), cycles: Math.max(x.cycles, y.cycles) };
+    });
+    return out;
+  }
+
+  // Храним последние DAYS_KEPT дней: иначе данные растут без предела
+  function pruneDaily() {
+    const keys = Object.keys(store.daily).sort();
+    if (keys.length <= DAYS_KEPT) return;
+    const next = {};
+    keys.slice(-DAYS_KEPT).forEach((k) => { next[k] = store.daily[k]; });
+    store.daily = next;
+  }
+
+  // ===== Локальное хранилище: try/catch везде, две копии, миграция со старых ключей =====
+  let storageOk = true;
+  (function probeStorage() {
+    try {
+      localStorage.setItem('__dr_probe', '1');
+      localStorage.removeItem('__dr_probe');
+    } catch (e) {
+      storageOk = false;
+    }
+  })();
+
+  function readLocal(key) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return null;
+      const obj = JSON.parse(raw);
+      return obj && typeof obj === 'object' && !Array.isArray(obj) ? obj : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function writeLocal(key, value) {
+    try {
+      localStorage.setItem(key, value);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function removeLocal(key) {
+    try { localStorage.removeItem(key); } catch (e) { /* ничего */ }
+  }
+
+  // Все локальные копии объединяются: ничего не теряется при обновлении
+  function loadLocal() {
+    try {
+      const sources = [KEY_V3, KEY_V3_BAK, KEY_V2, KEY_V1].map(readLocal).filter(Boolean).map(sanitize);
+      if (!sources.length) return defaults();
+      return sources.reduce((acc, s) => mergeStores(acc, s));
+    } catch (e) {
+      return defaults();
+    }
+  }
+
+  let store = loadLocal();
+
+  function saveLocal() {
+    if (!storageOk) return;
+    pruneDaily();
+    const json = JSON.stringify({ ...store, schema: SCHEMA });
+    writeLocal(KEY_V3_BAK, json);
+    // Старые ключи удаляем только после того, как новая запись прочиталась обратно
+    if (writeLocal(KEY_V3, json) && readLocal(KEY_V3)) {
+      removeLocal(KEY_V2);
+      removeLocal(KEY_V1);
+    }
+  }
+
+  // ===== Облако аккаунта (capability db) =====
+  let claudeApi = null;
+  let dlNs = null;
+  let remoteDoc = null;
+  let remoteReady = false;
+  let remoteBusy = false;
+  let remotePending = false;
+  let remoteTimer = 0;
+  let remoteFails = 0;
+  let remoteAttempts = 0;
+  let lastRemoteKey = null;
+  let remoteError = false;
+
+  // Любой сетевой вызов обязан завершиться: иначе флаг занятости залипнет навсегда
+  function withTimeout(promise, ms) {
+    let timer = 0;
+    const limit = new Promise((_, reject) => {
+      timer = setTimeout(() => reject(new Error('timeout')), ms);
+    });
+    return Promise.race([promise, limit]).finally(() => clearTimeout(timer));
+  }
+
+  function scheduleRemote(delay = 2500) {
+    if (!remoteReady) return;
+    clearTimeout(remoteTimer);
+    remoteTimer = setTimeout(flushRemote, delay);
+  }
+
+  async function flushRemote() {
+    remoteTimer = 0;
+    if (!remoteReady || !remoteDoc) return;
+    if (remoteBusy) { remotePending = true; return; }
+    const key = JSON.stringify({ ...store, savedAt: 0 });
+    if (key === lastRemoteKey) return;
+    const body = { ...store, schema: SCHEMA };
+    remoteBusy = true;
+    try {
+      await withTimeout(remoteDoc.set(body), 15000);
+      lastRemoteKey = key;
+      remoteError = false;
+      remoteFails = 0;
+    } catch (e) {
+      remoteError = true;
+      remoteFails += 1;
+      // Повтор с нарастающей паузой, не чаще раза в 5 минут
+      scheduleRemote(Math.min(300000, 15000 * 2 ** Math.min(remoteFails, 5)));
+    } finally {
+      remoteBusy = false;
+      renderSyncStatus();
+      if (remotePending) { remotePending = false; scheduleRemote(0); }
+    }
+  }
+
+  // Полное сохранение: локально сразу, в облако — с небольшой задержкой
+  function save() {
+    store.savedAt = Date.now();
+    saveLocal();
+    scheduleRemote();
+  }
+
+  async function initRemote() {
+    try {
+      claudeApi = window.claude || null;
+      if (!claudeApi || typeof claudeApi.use !== 'function') { renderSyncStatus(); return; }
+      const got = await Promise.race([
+        Promise.all([claudeApi.use('db'), claudeApi.use('user'), claudeApi.use('downloads')]),
+        new Promise((resolve) => setTimeout(() => resolve(null), 10000))
+      ]);
+      if (!got) throw new Error('no-answer');
+      const [db, user, dl] = got;
+      dlNs = dl || null;
+      if (!db || !user) { renderSyncStatus(); return; }
+      const uid = await user.id();
+      if (!uid) { renderSyncStatus(); return; }
+      remoteDoc = db.doc(`data/users/${uid}/progress`);
+      const snap = await withTimeout(remoteDoc.get(), 10000);
+      const wasOnboarded = store.onboarded;
+      if (snap.exists) {
+        store = mergeStores(store, sanitize(snap.data()));
+      }
+      remoteReady = true;
+      remoteAttempts = 0;
+      saveLocal();
+      lastRemoteKey = null;
+      scheduleRemote(0);
+      afterRemoteMerge(wasOnboarded);
+    } catch (e) {
+      remoteReady = false;
+      // Одна ошибка сети не должна навсегда отключить синхронизацию
+      if (remoteAttempts < 3) {
+        remoteAttempts += 1;
+        setTimeout(initRemote, 20000 * remoteAttempts);
+      }
+    }
+    renderSyncStatus();
+  }
+
+  // После подтягивания данных из аккаунта обновляем экраны, не трогая идущий сеанс
+  function afterRemoteMerge(wasOnboarded) {
+    applyTheme();
+    if (!S.started && !S.running) {
+      checkin.feeling = store.feeling || checkin.feeling;
+      checkin.limitMs = store.limitMs ?? checkin.limitMs;
+      S.limitMs = checkin.limitMs;
+      if (store.lastMode && has(MODES, store.lastMode)) S.modeKey = store.lastMode;
+    }
+    renderAll();
+    updateRing();
+    // Новое устройство: настройка уже пройдена в аккаунте
+    if (!wasOnboarded && store.onboarded && !$('#scrCheck').hidden) {
+      routeStart();
+    }
+  }
+
+  function renderSyncStatus() {
+    const el = $('#syncStatus');
+    if (!el) return;
+    el.classList.remove('ok', 'err');
+    if (remoteReady && remoteError) {
+      el.classList.add('err');
+      el.textContent = 'Не удалось сохранить в аккаунт. Прогресс сохранён в этом браузере, попробую снова.';
+    } else if (remoteReady) {
+      el.classList.add('ok');
+      el.textContent = 'Прогресс сохраняется в аккаунте и доступен на всех твоих устройствах.';
+    } else if (!storageOk) {
+      el.classList.add('err');
+      el.textContent = 'Хранилище браузера недоступно, прогресс может не сохраниться. Сделай экспорт.';
+    } else {
+      el.textContent = 'Прогресс сохраняется в этом браузере. Сделай экспорт, чтобы не потерять.';
+    }
+  }
+
+  // ===== Резервная копия: строка для копирования и файл =====
+  function exportObj() {
+    return { app: APP, exportedAt: new Date().toISOString(), ...store, schema: SCHEMA };
+  }
+
+  // UTF-8 в base64 без устаревших escape/unescape
+  function toBase64Utf8(str) {
+    const bytes = new TextEncoder().encode(str);
+    let bin = '';
+    bytes.forEach((b) => { bin += String.fromCharCode(b); });
+    return btoa(bin);
+  }
+
+  function fromBase64Utf8(b64) {
+    const bin = atob(b64);
+    const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
+    return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+  }
+
+  function encodeBackup() {
+    return 'DR3:' + toBase64Utf8(JSON.stringify(exportObj()));
+  }
+
+  function parseBackup(text) {
+    let t = String(text || '').trim();
+    if (t.length > MAX_IMPORT_CHARS) throw new Error('too-big');
+    if (t.startsWith('DR3:')) t = fromBase64Utf8(t.slice(4).trim());
+    const obj = JSON.parse(t);
+    if (!obj || typeof obj !== 'object' || Array.isArray(obj)) throw new Error('bad');
+    if (obj.app && obj.app !== APP) throw new Error('other-app');
+    return sanitize(obj);
+  }
+
+  function showBackup(mode) {
+    const exp = mode === 'export';
+    $('#backupBox').hidden = false;
+    $('#backupText').readOnly = exp;
+    $('#backupText').value = exp ? encodeBackup() : '';
+    $('#btnCopy').hidden = !exp;
+    $('#btnSaveFile').hidden = !(exp && dlNs);
+    $('#fileLabel').hidden = exp;
+    $('#btnApply').hidden = exp;
+    $('#backupMsg').textContent = exp
+      ? 'Сохрани строку (она работает и на другом устройстве) или файл.'
+      : 'Вставь строку или выбери файл копии, затем нажми «Загрузить».';
+  }
+
+  $('#btnExport').addEventListener('click', () => showBackup('export'));
+  $('#btnImport').addEventListener('click', () => showBackup('import'));
+
+  $('#btnCopy').addEventListener('click', async () => {
+    const ta = $('#backupText');
+    try {
+      await navigator.clipboard.writeText(ta.value);
+      $('#backupMsg').textContent = 'Скопировано.';
+    } catch (e) {
+      ta.focus();
+      ta.select();
+      $('#backupMsg').textContent = 'Выдели текст и скопируй вручную.';
+    }
+  });
+
+  $('#btnSaveFile').addEventListener('click', async () => {
+    if (!dlNs) return;
+    try {
+      await dlNs.save({ filename: 'dyhanie-ritm-backup.json', data: JSON.stringify(exportObj()) });
+      $('#backupMsg').textContent = 'Файл сохранён.';
+    } catch (e) {
+      $('#backupMsg').textContent = e && e.code === 'declined'
+        ? 'Сохранение отменено.'
+        : 'Файл не сохранился. Используй «Скопировать».';
+    }
+  });
+
+  $('#fileIn').addEventListener('change', (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    if (f.size > MAX_IMPORT_CHARS) {
+      $('#backupMsg').textContent = 'Файл слишком большой для копии прогресса.';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      $('#backupText').value = String(reader.result || '');
+      $('#backupMsg').textContent = 'Файл прочитан. Нажми «Загрузить».';
+    };
+    reader.onerror = () => { $('#backupMsg').textContent = 'Не удалось прочитать файл.'; };
+    reader.readAsText(f);
+  });
+
+  $('#btnApply').addEventListener('click', () => {
+    let incoming;
+    try {
+      incoming = parseBackup($('#backupText').value);
+    } catch (e) {
+      $('#backupMsg').textContent = 'Не получилось прочитать копию. Проверь, что скопирована целиком.';
+      return;
+    }
+    store = mergeStores(store, incoming);
+    store.savedAt = Date.now();
+    save();
+    flushRemote();
+    applyTheme();
+    renderAll();
+    updateRing();
+    const count = Object.values(store.medals).filter((r) => r > 0).length;
+    $('#backupMsg').textContent = `Готово: уровень ${levelIdx(store.xp) + 1}, ${store.xp} XP, медалей ${count}.`;
+  });
+
+  // ===== Звук: Web Audio API (генерируется в коде, файлов нет) =====
+  let actx = null;
+  let audio = null;
+
+  function ensureCtx() {
+    if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume();
+  }
+
+  function audioOn() {
+    if (store.sound === 'off' || audio) return;
+    try {
+      ensureCtx();
+      const master = actx.createGain();
+      master.gain.value = 0;
+      master.connect(actx.destination);
+      const nodes = [];
+      if (store.sound === 'noise') {
+        const len = actx.sampleRate * 2;
+        const buf = actx.createBuffer(1, len, actx.sampleRate);
+        const d = buf.getChannelData(0);
+        let lastOut = 0;
+        for (let i = 0; i < len; i++) {
+          const white = Math.random() * 2 - 1;
+          d[i] = (lastOut + (0.04 * white)) / 1.04;
+          lastOut = d[i];
+          d[i] *= 2.5;
+        }
+        const src = actx.createBufferSource();
+        src.buffer = buf;
+        src.loop = true;
+        const f = actx.createBiquadFilter();
+        f.type = 'lowpass';
+        f.frequency.value = 550;
+        src.connect(f).connect(master);
+        src.start();
+        nodes.push(src);
+      } else {
+        [110, 164.81, 220].forEach((hz, i) => {
+          const o = actx.createOscillator();
+          o.type = 'sine';
+          o.frequency.value = hz;
+          const g = actx.createGain();
+          g.gain.value = i === 0 ? 0.45 : 0.2;
+          o.connect(g).connect(master);
+          o.start();
+          nodes.push(o);
+        });
+      }
+      master.gain.setTargetAtTime(0.12, actx.currentTime, 0.8);
+      audio = { master, nodes };
+    } catch (e) {
+      audio = null;
+    }
+  }
+
+  function audioOff() {
+    if (!audio) return;
+    const a = audio;
+    audio = null;
+    try { a.master.gain.setTargetAtTime(0, actx.currentTime, 0.3); } catch (e) { /* ничего */ }
+    setTimeout(() => {
+      a.nodes.forEach((n) => { try { n.stop(); } catch (e) { /* уже остановлен */ } });
+      try { a.master.disconnect(); } catch (e) { /* ничего */ }
+    }, 1000);
+  }
+
+  // Звук «дышит» вместе с фазой: громче на вдохе, тише на выдохе
+  function breatheSound(p) {
+    if (!audio || p.target === null) return;
+    const level = p.target >= 0.85 ? 0.16 : 0.06;
+    try { audio.master.gain.setTargetAtTime(level, actx.currentTime, 0.6); } catch (e) { /* ничего */ }
+  }
+
+  // ===== Вибрация =====
+  function buzz(pattern) {
+    if (!store.haptics) return;
+    try {
+      if (navigator.vibrate) navigator.vibrate(pattern);
+    } catch (e) { /* не поддерживается */ }
+  }
+
+  // ===== Стрик: день засчитывается, если завершён хотя бы один цикл =====
+  function markActiveDay() {
+    const today = dayKey();
+    if (store.lastDay === today) return;
+    const yesterday = dayKey(addDays(-1));
+    store.streak = store.lastDay === yesterday ? store.streak + 1 : 1;
+    store.lastDay = today;
+  }
+
+  function displayStreak() {
+    const today = dayKey();
+    const yesterday = dayKey(addDays(-1));
+    return store.lastDay === today || store.lastDay === yesterday ? store.streak : 0;
+  }
+
+  function dayRec(key) {
+    if (!store.daily[key]) store.daily[key] = { ms: 0, cycles: 0 };
+    return store.daily[key];
+  }
+
+  // Время: до минуты — в секундах, дальше — «2 мин 15 сек»
+  function fmtDuration(ms) {
+    const s = Math.round(ms / 1000);
+    if (s < 60) return `${s} сек`;
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    return r ? `${m} мин ${r} сек` : `${m} мин`;
+  }
+
+  function fmtShort(ms) {
+    if (ms < 60000) return `${Math.round(ms / 1000)} сек`;
+    return `${Math.round(ms / 60000)} мин`;
+  }
+
+  function fmtClock(ms) {
+    const s = Math.max(0, Math.ceil(ms / 1000));
+    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  }
+
+  // ===== XP =====
+  function levelIdx(xp) {
+    let i = 0;
+    LEVELS.forEach((l, j) => { if (xp >= l.min) i = j; });
+    return i;
+  }
+
+  function addXp(n) {
+    store.xp += n;
+    buzz([30, 50, 30]);
+  }
+
+  // ===== Настройка и сеанс =====
+  const checkin = { feeling: store.feeling || null, limitMs: store.limitMs ?? 180000 };
+
+  const orb = $('#orb');
+  const ring2 = $('#ring2');
+  const glow = $('#glow');
+  const stage = $('#stage');
+  const rpBar = $('#rpBar');
+
+  const LAYERS = [
+    { el: orb, kind: 'scale', f: (t) => t },
+    { el: ring2, kind: 'scale', f: (t) => 0.92 + 0.22 * clamp01((t - 0.55) / 0.45) },
+    { el: glow, kind: 'opacity', f: (t) => 0.25 + 0.55 * clamp01((t - 0.55) / 0.45) }
+  ];
+
+  const S = {
+    modeKey: store.lastMode && has(MODES, store.lastMode) ? store.lastMode : 'relax',
+    limitMs: checkin.limitMs,
+    activeMs: 0,
+    runMs: 0,
+    cycles: 0,
+    phaseIdx: 0,
+    phaseElapsed: 0,
+    running: false,
+    started: false,
+    ended: false,
+    awarded: false,
+    lastTs: 0,
+    lastLocal: 0,
+    rafId: 0,
+    curT: 0.55,
+    anims: [],
+    lastUi: 0
+  };
+
+  function animateTo(t, dur) {
+    S.anims.forEach((a) => a.cancel());
+    S.anims = [];
+    LAYERS.forEach((L) => {
+      const from = L.f(S.curT);
+      const to = L.f(t);
+      const kf = L.kind === 'scale'
+        ? [{ transform: `scale(${from})` }, { transform: `scale(${to})` }]
+        : [{ opacity: from }, { opacity: to }];
+      S.anims.push(L.el.animate(kf, { duration: dur, easing: 'ease-in-out', fill: 'forwards' }));
+    });
+    S.curT = t;
+  }
+
+  function syncHold(p) {
+    stage.classList.toggle('hold', S.running && p.target === null);
+  }
+
+  function startPhase(i) {
+    const p = MODES[S.modeKey].phases[i];
+    S.phaseIdx = i;
+    $('#phaseLabel').textContent = p.label;
+    if (p.target !== null) animateTo(p.target, p.dur);
+    syncHold(p);
+    buzz(12);
+    breatheSound(p);
+  }
+
+  function updateRing() {
+    const ref = S.limitMs || 600000;
+    const pct = clamp01(S.activeMs / ref);
+    rpBar.style.strokeDashoffset = String(100 - pct * 100);
+  }
+
+  function completeCycle() {
+    S.cycles += 1;
+    store.cycles += 1;
+    store.modeCycles[S.modeKey] = (store.modeCycles[S.modeKey] || 0) + 1;
+    dayRec(dayKey()).cycles += 1;
+    addXp(5);
+    markActiveDay();
+    save();
+    checkMedals();
+  }
+
+  function rankOf(m, state) {
+    const v = m.metric(state);
+    return m.tiers.filter((t) => v >= t).length;
+  }
+
+  function checkMedals() {
+    const state = { cycles: store.cycles, modeCycles: store.modeCycles, runMs: S.runMs };
+    MEDALS.forEach((m) => {
+      const rank = rankOf(m, state);
+      const had = store.medals[m.id] || 0;
+      if (rank <= had) return;
+      store.medals[m.id] = rank;
+      save();
+      buzz([30, 50, 30]);
+    });
+  }
+
+  function tick(ts) {
+    if (!S.running) return;
+    if (!S.lastTs) S.lastTs = ts;
+    // dt ограничен: после сворачивания или блокировки экрана скачка времени не будет
+    const dt = Math.min(ts - S.lastTs, 250);
+    S.lastTs = ts;
+    S.activeMs += dt;
+    S.runMs += dt;
+    store.ms += dt;
+    dayRec(dayKey()).ms += dt;
+    S.phaseElapsed += dt;
+
+    const phases = MODES[S.modeKey].phases;
+    let p = phases[S.phaseIdx];
+    while (S.phaseElapsed >= p.dur) {
+      S.phaseElapsed -= p.dur;
+      let next = S.phaseIdx + 1;
+      if (next >= phases.length) {
+        next = 0;
+        completeCycle();
+      }
+      startPhase(next);
+      p = phases[next];
+    }
+
+    if (S.limitMs && S.activeMs >= S.limitMs) {
+      endSession(30);
+      return;
+    }
+
+    $('#count').textContent = Math.max(0, Math.ceil((p.dur - S.phaseElapsed) / 1000));
+    updateRing();
+
+    const now = performance.now();
+    if (now - S.lastUi > 400) {
+      S.lastUi = now;
+      checkMedals();
+      updateSub();
+    }
+    // Во время сеанса пишем только на устройство; в аккаунт — при паузе и конце
+    if (ts - S.lastLocal > 5000) {
+      S.lastLocal = ts;
+      saveLocal();
+    }
+    S.rafId = requestAnimationFrame(tick);
+  }
+
+  function start() {
+    if (S.running || S.ended) return;
+    S.running = true;
+    S.lastTs = 0;
+    if (!S.started) {
+      S.started = true;
+      startPhase(S.phaseIdx);
+    } else {
+      S.anims.forEach((a) => { if (a.playState === 'paused') a.play(); });
+      syncHold(MODES[S.modeKey].phases[S.phaseIdx]);
+    }
+    audioOn();
+    renderLive();
+    S.rafId = requestAnimationFrame(tick);
+  }
+
+  function pause() {
+    if (!S.running) return;
+    S.running = false;
+    cancelAnimationFrame(S.rafId);
+    S.anims.forEach((a) => { if (a.playState === 'running') a.pause(); });
+    stage.classList.remove('hold');
+    S.runMs = 0;
+    audioOff();
+    save();
+    renderLive();
+  }
+
+  function endSession(bonus) {
+    pause();
+    S.ended = true;
+    rpBar.style.strokeDashoffset = '0';
+    let gained = 0;
+    if (S.activeMs >= 60000 && !S.awarded) {
+      S.awarded = true;
+      gained = bonus;
+      addXp(gained);
+    }
+    const xpText = gained ? ` Начислено: +${gained} XP.` : '';
+    showSummary(`Сеанс завершён. Циклов: ${S.cycles}, время: ${fmtDuration(S.activeMs)}.${xpText}`);
+    save();
+    renderLive();
+    buzz([40, 60, 40]);
+  }
+
+  function showSummary(text) {
+    $('#summary').hidden = false;
+    $('#sumText').textContent = text;
+  }
+
+  function finishManually() {
+    if (S.ended || !S.started) return;
+    if (S.activeMs < 60000) {
+      showSummary('Сеанс короче минуты, XP не начисляется.');
+      return;
+    }
+    endSession(20);
+  }
+
+  // Полный сброс текущего сеанса: без циклических эффектов, состояние возвращается к началу
+  function resetSession() {
+    pause();
+    S.anims.forEach((a) => a.cancel());
+    S.anims = [];
+    S.curT = 0.55;
+    S.started = false;
+    S.ended = false;
+    S.awarded = false;
+    S.phaseIdx = 0;
+    S.phaseElapsed = 0;
+    S.activeMs = 0;
+    S.runMs = 0;
+    S.cycles = 0;
+    S.lastTs = 0;
+    stage.classList.remove('hold');
+    $('#summary').hidden = true;
+    updateRing();
+    showIdle();
+    renderLive();
+  }
+
+  function showIdle() {
+    $('#phaseLabel').textContent = 'Нажми «Старт»';
+    $('#count').textContent = Math.ceil(MODES[S.modeKey].phases[0].dur / 1000);
+    updateSub();
+  }
+
+  function updateSub() {
+    const n = MODES[S.modeKey].phases.length;
+    let txt = `Цикл ${S.cycles + 1} · фаза ${S.phaseIdx + 1} из ${n}`;
+    if (S.limitMs) txt += ` · осталось ${fmtClock(S.limitMs - S.activeMs)}`;
+    $('#subLine').textContent = txt;
+  }
+
+  function renderLive() {
+    updateSub();
+    $('#limitChip').textContent = S.limitMs ? `Лимит ${fmtDuration(S.limitMs)}` : 'Без лимита';
+    if (!S.ended) {
+      $('#btnPlay').textContent = S.running ? 'Пауза' : (S.started ? 'Продолжить' : 'Старт');
+    } else {
+      $('#btnPlay').textContent = 'Ещё раз';
+    }
+    $('#btnFinish').disabled = S.ended || !S.started;
+  }
+
+  // ===== Разделы и вкладки =====
+  function markPressed(container, attr, val) {
+    document.querySelectorAll(`${container} [${attr}]`).forEach((b) => {
+      b.setAttribute('aria-pressed', String(b.getAttribute(attr) === val));
+    });
+  }
+
+  function showTab(name) {
+    if (S.running) pause();
+    if (H.holding) holdEnd(true);
+    $('#viewBreath').hidden = name !== 'breath';
+    $('#viewStats').hidden = name !== 'stats';
+    $('#viewSettings').hidden = name !== 'settings';
+    document.querySelectorAll('.tab-btn').forEach((b) => {
+      if (b.dataset.tab === name) b.setAttribute('aria-current', 'page');
+      else b.removeAttribute('aria-current');
+    });
+    if (name === 'stats') renderStats();
+    if (name === 'settings') renderSettings();
+    window.scrollTo(0, 0);
+  }
+
+  // Подраздел «Дыхание»: сессия или тест лёгких
+  function showSub(name) {
+    if (name !== 'lungs' && H.holding) holdEnd(true);
+    $('#subSession').hidden = name !== 'session';
+    $('#subLungs').hidden = name !== 'lungs';
+    markPressed('#subSeg', 'data-sub', name);
+    if (name === 'lungs') renderLungStats();
+    window.scrollTo(0, 0);
+  }
+
+  function showScreen(id) {
+    ['scrCheck', 'scrCatalog', 'scrSession'].forEach((x) => { $('#' + x).hidden = x !== id; });
+    // Первая настройка идёт без переключателя подразделов
+    $('#subSeg').hidden = id === 'scrCheck';
+    showSub('session');
+    window.scrollTo(0, 0);
+  }
+
+  document.querySelectorAll('.tab-btn').forEach((b) => {
+    b.addEventListener('click', () => showTab(b.dataset.tab));
+  });
+
+  $('#subSeg').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-sub]');
+    if (b) showSub(b.dataset.sub);
+  });
+
+  // ===== Настройка: первый запуск или «Сбросить настройки» =====
+
+  function renderCheckin() {
+    $('#feelings').innerHTML = FEELINGS.map((f) =>
+      `<button type="button" class="opt" data-feel="${f.id}" aria-pressed="${f.id === checkin.feeling}">${f.label}</button>`
+    ).join('');
+    $('#times').innerHTML = TIMES.map((t) =>
+      `<button type="button" class="opt" data-ms="${t.ms}" aria-pressed="${t.ms === checkin.limitMs}">${t.label}</button>`
+    ).join('');
+    $('#btnToCatalog').disabled = !checkin.feeling;
+  }
+
+  $('#scrCheck').addEventListener('click', (e) => {
+    const f = e.target.closest('[data-feel]');
+    if (f) {
+      checkin.feeling = f.dataset.feel;
+      markPressed('#feelings', 'data-feel', checkin.feeling);
+      $('#btnToCatalog').disabled = false;
+      return;
+    }
+    const t = e.target.closest('[data-ms]');
+    if (t) {
+      checkin.limitMs = Number(t.dataset.ms);
+      markPressed('#times', 'data-ms', String(checkin.limitMs));
+    }
+  });
+
+  $('#btnToCatalog').addEventListener('click', () => {
+    store.onboarded = true;
+    store.feeling = checkin.feeling;
+    store.limitMs = checkin.limitMs;
+    save();
+    S.limitMs = checkin.limitMs;
+    renderCatalog();
+    showScreen('scrCatalog');
+  });
+
+  $('#btnEditCheck').addEventListener('click', () => showScreen('scrCheck'));
+
+  function renderCatalog() {
+    const f = FEELINGS.find((x) => x.id === checkin.feeling) || FEELINGS[0];
+    $('#catSub').textContent = `${f.label} · ${checkin.limitMs ? fmtDuration(checkin.limitMs) : 'без лимита'}`;
+    $('#modeGrid').innerHTML = Object.entries(MODES).map(([k, m], i) => `
+      <button type="button" class="mode-card" style="--i:${i}" data-mode="${k}">
+        ${k === f.mode ? '<span class="tag">Подходит</span>' : ''}
+        <span class="ic">${m.icon}</span>
+        <strong>${m.name}</strong>
+        <span class="pat">${m.phases.map((p) => p.dur / 1000).join(' · ')} сек</span>
+      </button>`).join('');
+  }
+
+  $('#modeGrid').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-mode]');
+    if (b) openMode(b.dataset.mode);
+  });
+
+  function openMode(key) {
+    const limitChanged = S.limitMs !== checkin.limitMs;
+    if (key !== S.modeKey || S.ended || limitChanged) {
+      S.modeKey = key;
+      S.limitMs = checkin.limitMs;
+      resetSession();
+    }
+    store.lastMode = key;
+    save();
+    $('#modeTitle').textContent = MODES[key].name;
+    showScreen('scrSession');
+    renderLive();
+  }
+
+  // Старт: первый раз — настройка; потом сразу последний режим или каталог
+  function routeStart() {
+    checkin.feeling = store.feeling || null;
+    checkin.limitMs = store.limitMs ?? 180000;
+    S.limitMs = checkin.limitMs;
+    renderCheckin();
+    if (!store.onboarded || !checkin.feeling) {
+      showScreen('scrCheck');
+      return;
+    }
+    if (store.lastMode && has(MODES, store.lastMode)) {
+      S.modeKey = store.lastMode;
+      $('#modeTitle').textContent = MODES[S.modeKey].name;
+      showScreen('scrSession');
+    } else {
+      renderCatalog();
+      showScreen('scrCatalog');
+    }
+    showIdle();
+    renderLive();
+  }
+
+  $('#btnPlay').addEventListener('click', () => {
+    if (S.ended) {
+      resetSession();
+      start();
+      return;
+    }
+    if (S.running) pause();
+    else start();
+  });
+
+  $('#btnFinish').addEventListener('click', finishManually);
+  $('#btnReset').addEventListener('click', resetSession);
+  $('#btnBack').addEventListener('click', () => {
+    pause();
+    renderCatalog();
+    showScreen('scrCatalog');
+  });
+
+  // ===== Тест лёгких =====
+  const H = { holding: false, t0: 0, last: 0, raf: 0 };
+  const holdBtn = $('#holdBtn');
+
+  function lungRank(ms) {
+    const s = Math.floor(ms / 1000);
+    let r = LUNG_RANKS[0];
+    LUNG_RANKS.forEach((x) => { if (s >= x.min) r = x; });
+    return r;
+  }
+
+  function renderLungStats() {
+    const best = store.bestHoldMs || 0;
+    const last = store.lastHoldMs || 0;
+    $('#bestHold').textContent = best ? fmtDuration(best) : '—';
+    $('#lastHold').textContent = last ? fmtDuration(last) : '—';
+    const cur = best ? lungRank(best) : null;
+    $('#lungRankNow').textContent = cur ? `Сейчас: ${cur.name}` : 'Пока без уровня';
+    $('#rankList').innerHTML = LUNG_RANKS.map((r) =>
+      `<div class="rank-row ${cur && cur.name === r.name ? 'current' : ''}"><span>${r.name}</span><span>${r.label}</span></div>`
+    ).join('');
+  }
+
+  function holdLoop() {
+    if (!H.holding) return;
+    const now = performance.now();
+    // Если кадры не приходили дольше секунды, страница была в фоне: замер не засчитываем
+    if (now - H.last > HOLD_GAP_MS) {
+      holdEnd(true);
+      $('#holdLabel').textContent = 'Замер прерван';
+      return;
+    }
+    H.last = now;
+    $('#holdTime').textContent = fmtDuration(now - H.t0);
+    H.raf = requestAnimationFrame(holdLoop);
+  }
+
+  function holdStart() {
+    if (H.holding) return;
+    H.holding = true;
+    H.t0 = performance.now();
+    H.last = H.t0;
+    holdBtn.classList.add('holding');
+    $('#holdLabel').textContent = 'Держи';
+    $('#holdTime').textContent = '0 сек';
+    buzz(10);
+    H.raf = requestAnimationFrame(holdLoop);
+  }
+
+  function holdEnd(discard) {
+    if (!H.holding) return;
+    H.holding = false;
+    cancelAnimationFrame(H.raf);
+    holdBtn.classList.remove('holding');
+    const ms = performance.now() - H.t0;
+    if (discard || ms < 1000) {
+      $('#holdLabel').textContent = discard ? 'Зажми' : 'Слишком коротко, ещё раз';
+      $('#holdTime').textContent = '0 сек';
+      return;
+    }
+    finishHold(ms);
+  }
+
+  function finishHold(ms) {
+    const prevBest = store.bestHoldMs || 0;
+    const isRecord = ms > prevBest;
+    const xp = Math.min(100, Math.round(ms / 1000) * 2);
+    store.lastHoldMs = Math.round(ms);
+    if (isRecord) store.bestHoldMs = Math.round(ms);
+    addXp(xp);
+    save();
+    const rank = lungRank(ms);
+    $('#holdLabel').textContent = `Уровень: ${rank.name} · +${xp} XP`;
+    $('#holdTime').textContent = fmtDuration(ms);
+    buzz([25, 40, 25]);
+    renderLungStats();
+  }
+
+  // Захват указателя: палец, уехавший с кнопки, не обрывает замер
+  holdBtn.addEventListener('pointerdown', (e) => {
+    if (e.button !== undefined && e.button !== 0) return;
+    try { holdBtn.setPointerCapture(e.pointerId); } catch (err) { /* не поддерживается */ }
+    holdStart();
+  });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach((type) => {
+    holdBtn.addEventListener(type, () => holdEnd(false));
+  });
+  holdBtn.addEventListener('contextmenu', (e) => e.preventDefault());
+  holdBtn.addEventListener('keydown', (e) => {
+    if (e.code !== 'Space' && e.code !== 'Enter') return;
+    e.preventDefault();
+    if (!e.repeat) holdStart();
+  });
+  holdBtn.addEventListener('keyup', (e) => {
+    if (e.code !== 'Space' && e.code !== 'Enter') return;
+    holdEnd(false);
+  });
+  holdBtn.addEventListener('blur', () => holdEnd(true));
+
+  // ===== Статистика: XP, график, медали =====
+
+  function fmtNum(m, n) {
+    return m.time ? fmtDuration(n) : `${n}`;
+  }
+
+  function medalState(m) {
+    const rank = Math.min(4, store.medals[m.id] || 0);
+    const value = m.metric({ cycles: store.cycles, modeCycles: store.modeCycles, runMs: S.runMs });
+    const next = m.tiers[rank];
+    const prev = rank ? m.tiers[rank - 1] : 0;
+    const pct = next
+      ? Math.max(0, Math.min(100, Math.round(((value - prev) / (next - prev)) * 100)))
+      : 100;
+    return { rank, value, next, pct, locked: rank === 0, tier: rank ? RIBBON_TIERS[rank - 1] : 'locked' };
+  }
+
+  let chartMetric = 'ms';
+
+  function renderChart() {
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = addDays(-i);
+      const rec = store.daily[dayKey(d)] || { ms: 0, cycles: 0 };
+      days.push({
+        label: d.toLocaleDateString('ru-RU', { weekday: 'short' }),
+        today: i === 0,
+        v: chartMetric === 'ms' ? rec.ms : rec.cycles
+      });
+    }
+    const max = Math.max(1, ...days.map((d) => d.v));
+    $('#chart').innerHTML = days.map((d) => `
+      <div class="col ${d.today ? 'today' : ''}">
+        <span class="val">${d.v ? (chartMetric === 'ms' ? fmtShort(d.v) : d.v) : ''}</span>
+        <div class="bar-wrap"><div class="bar-col" style="height:${d.v ? Math.max(6, Math.round((d.v / max) * 100)) : 3}%"></div></div>
+        <span class="day">${d.label}</span>
+      </div>`).join('');
+    const total = days.reduce((s, d) => s + d.v, 0);
+    $('#weekTotal').textContent = chartMetric === 'ms'
+      ? `За неделю: ${fmtDuration(total)}`
+      : `За неделю: ${total} циклов`;
+  }
+
+  function renderXp() {
+    const i = levelIdx(store.xp);
+    const cur = LEVELS[i];
+    const next = LEVELS[i + 1];
+    $('#lvlNum').textContent = `Уровень ${i + 1}`;
+    $('#lvlName').textContent = cur.name;
+    $('#xpTotal').textContent = `${store.xp} XP`;
+    if (next) {
+      const pct = Math.round(((store.xp - cur.min) / (next.min - cur.min)) * 100);
+      $('#xpBar').style.width = `${pct}%`;
+      $('#xpNext').textContent = `До «${next.name}»: ${next.min - store.xp} XP`;
+    } else {
+      $('#xpBar').style.width = '100%';
+      $('#xpNext').textContent = 'Максимальный уровень';
+    }
+  }
+
+  function renderStats() {
+    $('#streakNum').textContent = displayStreak();
+    $('#totalMin').textContent = fmtDuration(store.ms);
+    $('#totalCycles').textContent = store.cycles;
+    $('#bestHold2').textContent = store.bestHoldMs ? fmtDuration(store.bestHoldMs) : '—';
+    renderXp();
+    renderChart();
+
+    let earned = 0;
+    const html = MEDALS.map((m) => {
+      const st = medalState(m);
+      if (st.rank) earned++;
+      const chip = st.locked ? 'Не получена' : RANKS[st.rank - 1];
+      const sub = st.next
+        ? `До ранга «${RANKS[st.rank]}»: ${fmtNum(m, Math.min(st.value, st.next))} из ${fmtNum(m, st.next)}`
+        : 'Максимальный ранг';
+      const dots = [0, 1, 2, 3].map((i) => `<i class="${i < st.rank ? 'on' : ''}"></i>`).join('');
+      return `
+        <button type="button" class="medal-card ${st.locked ? 'locked' : ''}" data-tier="${st.tier}" data-medal="${m.id}" aria-label="${m.name}: подробнее">
+          ${medalUnit(m, st.locked)}
+          <strong>${m.name}</strong>
+          <span class="small muted">${m.cond}</span>
+          <span class="rank-chip">${chip}</span>
+          <div class="dots">${dots}</div>
+          <div class="mprog"><i style="width:${st.pct}%"></i></div>
+          <span class="small muted">${sub}</span>
+        </button>`;
+    }).join('');
+
+    $('#medalCount').textContent = `${earned} / ${MEDALS.length}`;
+    $('#medalGrid').innerHTML = html;
+    markPressed('#chartSeg', 'data-metric', chartMetric);
+  }
+
+  $('#chartSeg').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-metric]');
+    if (!b) return;
+    chartMetric = b.dataset.metric;
+    markPressed('#chartSeg', 'data-metric', chartMetric);
+    renderChart();
+  });
+
+  // ===== Медали: модальное окно =====
+
+  function medalModalHtml(m) {
+    const st = medalState(m);
+    const rankName = st.locked ? 'Не получена' : RANKS[st.rank - 1];
+    const progress = st.next
+      ? `Сейчас: ${fmtNum(m, Math.min(st.value, st.next))} из ${fmtNum(m, st.next)} до ранга «${RANKS[st.rank]}»`
+      : 'Все ранги получены';
+    const ladder = RANKS.map((name, i) => {
+      const reached = st.rank > i;
+      const tier = reached ? RIBBON_TIERS[i] : 'locked';
+      return `
+        <div class="rung ${reached ? '' : 'locked'}" data-tier="${tier}">
+          <div class="mini">${medalUnit(m, !reached)}</div>
+          <strong>${name}</strong>
+          <span>${fmtNum(m, m.tiers[i])}</span>
+        </div>`;
+    }).join('');
+    return `
+      <p class="eyebrow">Медаль</p>
+      <h2 class="modal-title" id="mTitle">${m.name}</h2>
+      <div class="preview" data-tier="${st.tier}">${medalUnit(m, st.locked)}</div>
+      <div class="modal-meta">
+        <span class="rank-chip" style="color:var(--chip);border-color:var(--chip)">${rankName}</span>
+        <p class="small"><strong>Условие:</strong> ${m.cond}</p>
+        <p class="small muted">${progress}</p>
+      </div>
+      <p class="eyebrow sect" style="margin-top:14px">Ранги</p>
+      <div class="ladder">${ladder}</div>`;
+  }
+
+  function openMedal(id) {
+    const m = MEDALS.find((x) => x.id === id);
+    if (!m) return;
+    $('#mBody').innerHTML = medalModalHtml(m);
+    $('#medalModal').hidden = false;
+    $('#mSheet .modal-x').focus();
+  }
+
+  function closeMedal() {
+    $('#medalModal').hidden = true;
+  }
+
+  $('#medalGrid').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-medal]');
+    if (b) openMedal(b.dataset.medal);
+  });
+  $('#medalModal').addEventListener('click', (e) => {
+    if (e.target.closest('[data-close]')) closeMedal();
+  });
+
+  // ===== Настройки =====
+
+  function renderSettings() {
+    markPressed('#themeSeg', 'data-theme-pick', store.theme);
+    $('#themeHint').textContent = THEME_HINTS[store.theme];
+    markPressed('#soundSeg', 'data-sound', store.sound);
+    $('#btnHaptics').textContent = `Вибрация: ${store.haptics ? 'вкл' : 'выкл'}`;
+    renderSyncStatus();
+  }
+
+  function applyTheme() {
+    document.documentElement.setAttribute('data-theme', store.theme);
+  }
+
+  $('#themeSeg').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-theme-pick]');
+    if (!b) return;
+    store.theme = b.dataset.themePick;
+    save();
+    applyTheme();
+    renderSettings();
+  });
+
+  $('#soundSeg').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-sound]');
+    if (!b) return;
+    store.sound = b.dataset.sound;
+    save();
+    audioOff();
+    if (S.running) audioOn();
+    renderSettings();
+  });
+
+  $('#btnHaptics').addEventListener('click', () => {
+    store.haptics = !store.haptics;
+    save();
+    renderSettings();
+    if (store.haptics) buzz(15);
+  });
+
+  // Сброс настроек: прогресс не трогаем
+  $('#btnResetSettings').addEventListener('click', () => {
+    resetSession();
+    store.onboarded = false;
+    store.feeling = null;
+    store.limitMs = null;
+    store.lastMode = null;
+    save();
+    checkin.feeling = null;
+    checkin.limitMs = 180000;
+    S.limitMs = checkin.limitMs;
+    renderCheckin();
+    showTab('breath');
+    showScreen('scrCheck');
+  });
+
+  // Полный сброс прогресса: два нажатия; новый epoch не даёт старым копиям вернуть данные
+  let resetArmed = false;
+  let resetTimer = 0;
+  $('#btnResetAll').addEventListener('click', (e) => {
+    if (!resetArmed) {
+      resetArmed = true;
+      e.currentTarget.textContent = 'Нажми ещё раз, чтобы сбросить';
+      clearTimeout(resetTimer);
+      resetTimer = setTimeout(() => {
+        resetArmed = false;
+        e.currentTarget.textContent = 'Сбросить прогресс';
+      }, 3000);
+      return;
+    }
+    resetArmed = false;
+    e.currentTarget.textContent = 'Сбросить прогресс';
+    resetSession();
+    store = {
+      ...defaults(),
+      epoch: store.epoch + 1,
+      theme: store.theme,
+      haptics: store.haptics,
+      sound: store.sound,
+      onboarded: store.onboarded,
+      feeling: store.feeling,
+      limitMs: store.limitMs,
+      lastMode: store.lastMode
+    };
+    save();
+    flushRemote();
+    renderAll();
+    $('#backupBox').hidden = true;
+  });
+
+  function renderAll() {
+    applyTheme();
+    renderStats();
+    renderLungStats();
+    renderSettings();
+  }
+
+  // ===== Глобальные обработчики =====
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !$('#medalModal').hidden) { closeMedal(); return; }
+    if (e.code !== 'Space') return;
+    if ($('#viewBreath').hidden || $('#subSession').hidden || $('#scrSession').hidden || !$('#medalModal').hidden) return;
+    if (e.target.closest && e.target.closest('button, input, textarea')) return;
+    e.preventDefault();
+    $('#btnPlay').click();
+  });
+
+  // Уход со страницы: сразу останавливаем сеанс и пишем данные
+  function flushNow() {
+    pause();
+    holdEnd(true);
+    saveLocal();
+    clearTimeout(remoteTimer);
+    flushRemote();
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) flushNow();
+  });
+  window.addEventListener('pagehide', flushNow);
+  document.addEventListener('freeze', flushNow);
+
+  // ===== Запуск =====
+  applyTheme();
+  renderCheckin();
+  renderLungStats();
+  renderSettings();
+  showTab('breath');
+  routeStart();
+  updateRing();
+  renderSyncStatus();
+  initRemote();
+})();
+</script>
